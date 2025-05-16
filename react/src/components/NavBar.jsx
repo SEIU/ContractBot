@@ -14,12 +14,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../assets/SEIU.png";
 
 export default function NavBar() {
-  const { authorizedUser, setAuthorizedUser } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
   const handleLogOutClick = () => {
-    setAuthorizedUser(
-      // Reset authorizedUser state and navigate to login page
+    setUser(
+      // Reset user state and navigate to login page
       { userName: null, isAuthenticated: false }
     );
     navigate("/login");
@@ -37,16 +37,16 @@ export default function NavBar() {
           component="div"
           sx={{
             font: "helvetica; arial; sans-serif",
-            "font-style": "italic",
-            "font-weight": "bold",
-            "letter-spacing": "0.02em",
-            "font-size": "1.6em",
+            fontStyle: "italic",
+            fontWeight: "bold",
+            letterSpacing: "0.02em",
+            fontSize: "1.6em",
             flexGrow: 1,
           }}
         >
           ContractBot
         </Typography>
-        {authorizedUser.isAuthenticated && (
+        {user.isAuthenticated && (
           <Button color="inherit" onClick={handleLogOutClick}>
             Log out
           </Button>

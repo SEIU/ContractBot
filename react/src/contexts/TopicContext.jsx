@@ -1,14 +1,46 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { createAuthenticationParams } from "../authentication/authentication";
 import { createTopicId } from "../utils/utils";
+import { useAuth } from "./AuthContext";
+import api from "../api/api";
 
 const TopicContext = createContext();
 
 export function TopicProvider({ children }) {
   const [topics, setTopics] = useState([]);
+  const [currentTopic, setCurrentTopic] = useState(null);
+  const { user } = useAuth();
 
-  // useEffect(() => {
-  //   console.log("topic context, topics: ", topics);
-  // });
+  useEffect(() => {
+    console.log("topic context, topics: ", topics);
+  }, []);
+
+  useEffect(() => {
+    console.log("topic context, currentTopic: ", currentTopic);
+  }, [currentTopic]);
+
+  useEffect(() => {
+    // fetch and set topics
+    async function fetchUserTopics() {
+      try {
+        const authParams = await createAuthenticationParams();
+        const url = `/user-topics?${authParams}&OnBehalfOf=${user.userName}`;
+        const res = await api.get(url);
+        if (res.status === 200) {
+          console.log("fetch user topics res: ", res);
+          // TODO we need to fetch topic "names" as well as ids and handle it here
+          const fetchedTopics = res.data.map((id) => createTopic(id));
+          setTopics(fetchedTopics);
+        }
+      } catch (error) {
+        console.log("Its an error: ", error);
+      }
+    }
+
+    if (user.isAuthenticated) {
+      fetchUserTopics();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (topics.length === 0) {
@@ -16,9 +48,11 @@ export function TopicProvider({ children }) {
       setTopics([initialTopic]);
       setNewCurrentTopic(initialTopic);
     }
-  }, []);
+  }, [topics]);
 
   const setNewCurrentTopic = (newCurrentTopic) => {
+    console.log("setNewCurrentTopic");
+    setCurrentTopic(newCurrentTopic);
     setTopics((prevTopics) =>
       prevTopics.map((t) => ({
         ...t,
@@ -28,6 +62,8 @@ export function TopicProvider({ children }) {
   };
 
   const updateCurrentTopic = (updatedTopic) => {
+    console.log("updateCurrentTopic");
+    // Typically used to update the sequence
     setTopics((prevTopics) =>
       prevTopics.map((topic) => {
         if (topic.topicId === updatedTopic.topicId) {
@@ -40,6 +76,8 @@ export function TopicProvider({ children }) {
   };
 
   const updateTopicName = (topicId, newTopicName) => {
+    // TODO this can be part of updateCurrentTopic ?
+    console.log("updateTopicName");
     if (newTopicName.length > 100) {
       newTopicName = newTopicName.slice(0, 100) + "...";
     }
@@ -58,6 +96,7 @@ export function TopicProvider({ children }) {
     topics,
     updateTopicName,
     setTopics,
+    currentTopic,
   };
 
   return (
@@ -65,12 +104,12 @@ export function TopicProvider({ children }) {
   );
 }
 
-export const createTopic = () => {
-  const topicId = createTopicId();
+export const createTopic = (tId) => {
+  const id = tId || createTopicId();
 
   const newTopic = {
-    topicId: topicId,
-    topicName: `New Topic - ${topicId.slice(0, 3)}`,
+    topicId: id,
+    topicName: `New Topic - ${id.slice(0, 3)}`,
     isCurrent: true,
     seq: 1,
   };

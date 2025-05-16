@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useTopic, createTopic } from "../../contexts/TopicContext";
+import { useTopic, createTopic } from "../contexts/TopicContext";
 import {
   Box,
   List,
@@ -11,7 +11,7 @@ import {
 } from "@mui/material/";
 import AddIcon from "@mui/icons-material/Add";
 
-export default function Sidebar({ clearMessages, fetchTopicThread }) {
+export default function Sidebar() {
   // [{topicId: "abc123", topicName: "What is life?", isCurrent: true, seq: 2}, ...]
   const { topics, setTopics, setNewCurrentTopic } = useTopic();
 
@@ -20,18 +20,14 @@ export default function Sidebar({ clearMessages, fetchTopicThread }) {
     let newTopic = createTopic();
     setTopics((prevTopics) => [...prevTopics, newTopic]);
     setNewCurrentTopic(newTopic);
-    // clear conversation
-    clearMessages();
   };
 
   // set as current topic
   const handleSelectTopic = async (topic) => {
     setNewCurrentTopic(topic);
-    clearMessages();
-    fetchTopicThread(topic.topicId);
   };
 
-  const sidebarHtml = (
+  return (
     <Box sx={{ width: "250px", marginRight: "10px" }}>
       <Button onClick={handleNewTopicClick}>
         <AddIcon />
@@ -61,5 +57,4 @@ export default function Sidebar({ clearMessages, fetchTopicThread }) {
       </nav>
     </Box>
   );
-  return sidebarHtml;
 }

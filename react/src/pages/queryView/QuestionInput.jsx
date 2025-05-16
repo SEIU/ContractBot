@@ -12,26 +12,26 @@ function QuestionInput({ register, isQuerying }) {
   };
 
   return (
-    <>
+    <Box sx={{ marginTop: "10px" }}>
       <TextField
+        sx={{ width: "70%" }}
         label="Ask your question"
         multiline
         variant="outlined"
         disabled={isQuerying.isQuerying}
-        style={{ width: "80%", margin: "1em 0 2em 0", height: "5em" }}
         {...register("question")}
         onKeyDown={handleKeyDown}
       />
       <Button
+        sx={{ height: "56px", width: "85px", marginLeft: "15px" }}
         variant="contained"
         type="submit"
         onClick={handleKeyDown}
         disabled={isQuerying.isQuerying}
-        style={{ width: "10%", margin: "1.3em 0 2em 1em", height: "3.5em" }}
       >
         Ask
       </Button>
-    </>
+    </Box>
   );
 }
 

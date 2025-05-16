@@ -21,7 +21,7 @@ export default function Login() {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { setAuthorizedUser } = useAuth();
+  const { setUser } = useAuth();
 
   const onSubmit = async (data) => {
     const params = await createAuthenicateUserParams(
@@ -34,7 +34,7 @@ export default function Login() {
       const res = await api.get(url);
       if (res.status === 200) {
         console.log("good user!");
-        setAuthorizedUser({ userName: data.username, isAuthenticated: true });
+        setUser({ userName: data.username, isAuthenticated: true });
         navigate("/");
       } else {
         setErrorMessage("Invalid credentials");
