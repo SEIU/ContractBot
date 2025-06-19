@@ -50,5 +50,5 @@ else
 fi
 echo "Starting Inference Watcher"
 export TOKENIZERS_PARALLELISM=true
-source .venv/bin/activate
+source /venv/bin/activate
 nohup engine/watch 2>>$INFERENCE_LOG &
