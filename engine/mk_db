@@ -59,9 +59,14 @@ def get_metadata(document: Path) -> str:
         "union": "Union",
         "unit_size": "Unit Size",
         "upload_time": "Uploaded At",
-        "Year": "Year",
+        "Author": "Author",
+        "Created": "Created",
         "Org": "Org",
+        "Keywords": "Keywords",
+        "Subject": "Subject",
+        "Title": "Title",
         "Topics": "Topics",
+        "Year": "Year",
     }
     meta_file = document.with_suffix(".meta")
     metadata: str = ""
