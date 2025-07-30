@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ ! -d temp ]; then
-    echo "Generating certificates for BossBot"
+    echo "Generating certificates for ContractBot"
     mkdir -p temp
     openssl req \
       -batch \
@@ -8,7 +8,7 @@ if [ ! -d temp ]; then
       -nodes \
       -days 365 \
       -newkey rsa:2048 \
-      -subj "/C=US/O=SEIU/OU=DSA/CN=bossbotca" \
+      -subj "/C=US/O=SEIU/OU=DSA/CN=contractbotca" \
       -keyout temp/ca.key \
       -out temp/ca.crt
     echo '01' > temp/ca.srl
@@ -18,7 +18,7 @@ if [ ! -d temp ]; then
     openssl crl -in temp/ca.crl.pem -outform DER -out temp/ca.crl.der
     openssl genrsa -out temp/server.key 2048
     openssl req -new -config openssl.cnf -key temp/server.key \
-      -subj "/C=US/O=SEIU/OU=DSA/CN=bossbotlocal" -out temp/server.csr
+      -subj "/C=US/O=SEIU/OU=DSA/CN=contractbotlocal" -out temp/server.csr
     openssl ca -batch -config openssl.cnf -extensions server_ext -notext \
       -in temp/server.csr -out temp/server.crt
 fi

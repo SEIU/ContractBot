@@ -24,7 +24,9 @@ def collection_info(client):
         collection_obj = client.get_collection(c)
         metric = collection_obj.configuration_json["hnsw_configuration"]["space"]
         count = collection_obj.count()
-        print(f"{c}: {count:,} vectors, using {metric} metric")
+        count = collection_obj.count()
+        descr = collection_obj.metadata.get("description", "")
+        print(f"{c}: {count:,} vectors, using {metric} metric\n  {descr}")
 
 
 def collection_delete(client, collection):
@@ -138,8 +140,8 @@ def add_document(
     "-c",
     "--collection",
     type=str,
-    default="BossBot",
-    help="Name of collection to create (default 'BossBot')",
+    default="SEIU-contracts",
+    help="Name of collection (default 'SEIU-contracts')",
 )
 @click.option(
     "-l",
