@@ -171,7 +171,7 @@ Usage: mk_db [OPTIONS]
 Options:
   --reset                 Reset the vector database of document chunks
   -f, --filelist TEXT     File with list of files to process, one per line
-  -c, --collection TEXT   Name of collection to create (default 'BossBot')
+  -c, --collection TEXT   Name of collection (default 'SEIU- contracts')
   -l, --list-collections  List the existing collections and their sizes
   --delete-collection     Delete a collection (requires confirmation)
   --cosine                Use cosine similarity metric not squared L2 norm
@@ -179,7 +179,7 @@ Options:
   -n, --num-docs INTEGER  Limit processing to N files
   -p, --pattern TEXT      Generate 'documents.cfg' from glob pattern
   -v, --verbose           More verbose output
-  -h, -?, --help          Show this message and exit.
+  -?, -h, --help          Show this message and exit.
 ```
 
 Documents that can be vectorized must be plain text. However, using tools
@@ -234,7 +234,7 @@ a configuration file—you reference the configuration, e.g.:
 ```sh
 % engine/mk_db -f documents.cfg-l2-2025-04-11 2>/dev/null
 Processed 1 documents in 6 seconds
-Collection BossBot has 3,369,537 vectors/chunks
+Collection SEIU-contracts has 3,369,537 vectors/chunks
 ```
 
 In the example shown, we discard STDERR. This hides the progress bars, but

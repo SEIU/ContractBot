@@ -264,7 +264,7 @@ def search_fragments(
     query: str,
     n_results: int = 5,
     max_distance: float = 1.0,
-    collection_name: str = "BossBot",
+    collection_name: str = "SEIU-contracts",
 ) -> list[Result]:
     client = chromadb.PersistentClient()
     collection = client.get_collection(name=collection_name)
@@ -286,7 +286,7 @@ def get_rag(
     query: str,
     n_results: int = 50,
     max_distance: float = 1.0,
-    collection_name: str = "BossBot",
+    collection_name: str = "SEIU-contracts",
 ) -> str:
     results = search_fragments(
         query,
