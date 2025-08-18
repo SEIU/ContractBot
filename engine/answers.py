@@ -340,8 +340,8 @@ def ask(
     user: str = "Unknown",
     model: str | None = "default",
     no_rag: bool = False,
-    no_context: bool = False,
     introduction: str = INTRODUCTION,
+    collection_name: str = "SEIU-contracts",
 ) -> tuple[list[str], list[str], int, int]:
     if not model:
         # Mypy complaint is odd:
@@ -355,8 +355,8 @@ def ask(
     # If invalid or alias given for model, use default
     _query = expand_categories(query)
     model = MODELS.get(model) or MODELS["default"]
-    context = "" if no_context else get_context(topic)
-    rag_docs = "" if no_rag else get_rag(query)
+    context = get_context(topic) if topic else ""
+    rag_docs = "" if no_rag else get_rag(query, collection_name=collection_name)
 
     if len(context) > 200_000:
         # This topic has aquired many prior answers.  Age out the oldest answers

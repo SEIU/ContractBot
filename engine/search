@@ -3,20 +3,41 @@
 Find the best matching fragments for a given query.
 """
 
-import sys
+import click
 
 from engine.answers import search_fragments
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(f"Usage: python {__file__} <query> [n_results]")
-        sys.exit()
-    query = sys.argv[1]
-    n_results = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-    max_distance = float(sys.argv[3]) if len(sys.argv) > 3 else 1.0
 
-    results = search_fragments(query, n_results)
+@click.command()
+@click.option(
+    "-n",
+    "--num-results",
+    default=5,
+    type=int,
+    help="Maximum number of results to return.",
+)
+@click.option(
+    "-m",
+    "--max-distance",
+    default=1.0,
+    type=float,
+    help="Maximum distance for matching fragments.",
+)
+@click.option(
+    "-c",
+    "--collection",
+    help="Name of the collection to search",
+    default="SEIU-contracts",
+)
+@click.argument("query")
+def main(query: str, num_results: int, max_distance: float, collection: str) -> None:
+    results = search_fragments(query, num_results, collection_name=collection)
     for result in results:
-        print(f"Distance {result.distance:.2f}")
-        print(result.doc.strip())
-        print("-----")
+        if result.distance <= max_distance:
+            print(f"Distance {result.distance:.2f}")
+            print(result.doc.strip())
+            print("-----")
+
+
+if __name__ == "__main__":
+    main()

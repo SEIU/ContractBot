@@ -1,27 +1,37 @@
 #!/usr/bin/env python
-import os
-from sys import argv, exit
 from textwrap import wrap
+
+import click
 
 from engine.answers import ask
 
-if __name__ == "__main__":
-    if len(argv) < 3:
-        print("Usage: answer <query> <topic> [model]")
-        exit(1)
 
-    # Check if verbose mode is enabled
-    verbose = os.getenv("ENGINE_VERBOSE")
-
-    # Parse command-line arguments
-    query = argv[1]  # The query to be answered
-    topic = argv[2]  # The topic related to the query
-    # The model to use for answering
-    model = argv[3] if len(argv) == 4 else os.getenv("ENGINE_MODEL", "default")
-    user = "Developer"
+@click.command()
+@click.option(
+    "-c",
+    "--collection",
+    help="Name of the collection to search",
+    default="SEIU-contracts",
+)
+@click.option(
+    "-m",
+    "--model",
+    help="Name of the LLM model to use",
+    default="default",
+)
+@click.option("-t", "--topic", help="Topic related to the query", default="")
+@click.option("-v", "--verbose", help="Enable verbose mode", is_flag=True)
+@click.argument("query")
+def main(collection, query, model, topic, verbose):
 
     # Call the ask function from the engine.answers module
-    think, answer, seq, seconds = ask(query, topic, user, model)
+    think, answer, seq, seconds = ask(
+        query = query,
+        topic = topic,
+        user = "Developer",
+        model = model,
+        collection_name=collection,
+    )
 
     # Print the topic, sequence number, and query
     print(f"Topic: {topic} [{seq}]")
@@ -46,3 +56,7 @@ if __name__ == "__main__":
 
     # Print the time taken to compute the answer
     print(f"Answer computed in {seconds:,} seconds with model '{model}'")
+
+
+if __name__ == "__main__":
+    main()
