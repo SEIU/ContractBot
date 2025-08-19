@@ -39,6 +39,18 @@ def collection_delete(client, collection):
             print(f"The collection {confirm} does not exist")
 
 
+def collection_describe(client, collection):
+    confirm = input("Do you wish to change description? [type name of collection again] ")
+    if confirm == collection:
+        description = input("Description: ")
+        try:
+            collection_obj = client.get_collection(name=collection)
+            collection_obj.modify(metadata={"description": description})
+            print(f"The collection {confirm} was described as '{description}'")
+        except Exception as e:
+            print(f"Failed to rename collection: {e}")
+
+
 def get_metadata(document: Path) -> str:
     useful_keys = {
         "city": "City",
@@ -140,8 +152,8 @@ def add_document(
     "-c",
     "--collection",
     type=str,
-    default="SEIU-contracts",
-    help="Name of collection (default 'SEIU-contracts')",
+    default="INVALID",
+    help="Name of collection (mandatory for many operations)",
 )
 @click.option(
     "-l",
@@ -153,6 +165,11 @@ def add_document(
     "--delete-collection",
     is_flag=True,
     help="Delete a collection (requires confirmation)",
+)
+@click.option(
+    "--describe-collection",
+    is_flag=True,
+    help="Describe a collection in the document database",
 )
 @click.option(
     "--cosine",
@@ -184,6 +201,7 @@ def main(
     collection: str,
     list_collections: bool,
     delete_collection: bool,
+    describe_collection: str,
     cosine: bool,
     inner: bool,
     num_docs: int,
@@ -205,6 +223,9 @@ def main(
         return 0
     elif delete_collection:
         collection_delete(client, collection)
+        return 0
+    elif describe_collection:
+        collection_describe(client, collection)
         return 0
 
     if pattern:
