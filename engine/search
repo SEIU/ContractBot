@@ -31,7 +31,7 @@ from engine.answers import search_fragments
 )
 @click.argument("query")
 def main(query: str, num_results: int, max_distance: float, collection: str) -> None:
-    results = search_fragments(query, num_results, collection_name=collection)
+    results = search_fragments(query, n_results=num_results, collection_name=collection)
     for result in results:
         if result.distance <= max_distance:
             print(f"Distance {result.distance:.2f}")

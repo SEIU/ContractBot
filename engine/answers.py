@@ -10,6 +10,8 @@ import chromadb
 
 from app.models import MODELS
 
+default_collections = ["SEIU-contracts", "UCB-Labor-Center"]
+
 Result = namedtuple("Result", ["doc", "distance"])
 INTRODUCTION = """
 You are an AI assistant supporting local union negotiators who are drafting,
@@ -262,12 +264,18 @@ EXAMPLE_RESPONSE = {
 
 def search_fragments(
     query: str,
+    collection_name: str = "INVALID",
     n_results: int = 5,
     max_distance: float = 1.0,
-    collection_name: str = "SEIU-contracts",
 ) -> list[Result]:
-    client = chromadb.PersistentClient()
-    collection = client.get_collection(name=collection_name)
+    if not collection_name:
+        return []
+    try:
+        client = chromadb.PersistentClient()
+        collection = client.get_collection(name=collection_name)
+    except Exception as e:
+        print(f"Error opening collection: {collection_name}")
+        return []
     with redirect_stderr(io.StringIO()) as _f:
         matches = collection.query(query_texts=[query], n_results=n_results)
 
@@ -286,14 +294,19 @@ def get_rag(
     query: str,
     n_results: int = 50,
     max_distance: float = 1.0,
-    collection_name: str = "SEIU-contracts",
+    collections: list[str] = default_collections,
 ) -> str:
-    results = search_fragments(
-        query,
-        n_results=n_results,
-        max_distance=max_distance,
-        collection_name=collection_name,
-    )
+    results = []
+    for collection in collections:
+        results.extend(
+            search_fragments(
+                query,
+                n_results=n_results,
+                max_distance=max_distance,
+                collection_name=collection,
+            )
+        )
+    if     
     # Only "paragraphs" that match, not the header metadata
     docs = [result.doc for result in results]
     chunks = "\n\n".join(d.split("\n.....\n")[1] for d in docs)
@@ -341,7 +354,7 @@ def ask(
     model: str | None = "default",
     no_rag: bool = False,
     introduction: str = INTRODUCTION,
-    collection_name: str = "SEIU-contracts",
+    collections: list[str] = ["SEIU-contracts"],
 ) -> tuple[list[str], list[str], int, int]:
     if not model:
         # Mypy complaint is odd:
@@ -356,7 +369,7 @@ def ask(
     _query = expand_categories(query)
     model = MODELS.get(model) or MODELS["default"]
     context = get_context(topic) if topic else ""
-    rag_docs = "" if no_rag else get_rag(query, collection_name=collection_name)
+    rag_docs = "" if no_rag else get_rag(query, collections=collections)
 
     if len(context) > 200_000:
         # This topic has aquired many prior answers.  Age out the oldest answers
