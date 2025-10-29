@@ -2,4 +2,4 @@
 
 Customized LLM to aid with contract negotiation
 
-Date: 2025-06-27
+Date: 2025-10-29
