@@ -26,6 +26,29 @@ The bulk of the computational load relies on one or more engines. We
 and controlled by the implementer of a ContractBot instance, and **not** a
 cloud-hosted instance under the control of an external entity.
 
+## Install uv
+
+Package management in ContractBot is handled with
+[`uv`](https://docs.astral.sh/uv/getting-started/installation/). You can
+install `uv` with:
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+From there, generally all development and deployment should start with:
+
+```
+$ uv sync
+$ source .venv/bin/activate
+```
+
+In the relevant directories.
+
+In general, we recommend using `uv` for *all* Python-related software
+development.  It's simply much better than all previous tooling for package
+management and virtual environment management.
+
 ## Deploying an Inference Engine
 
 By design, an Inference Engine that may contain proprietary information, or
@@ -72,6 +95,28 @@ nohup engine/watch 2>>$INFERENCE_LOG &
 
 You may wish to modify details of `inference.sh` and/or launch `engine/watch`
 directly; such changes are straightforward.
+
+The script `engine/watch` begins by attempting to load environment variables
+from `$HOME/.bot.yaml`.  Such a file resembles the below (use better
+passwords, of course):
+
+```sh
+bossbot|Infererence> cat $HOME/.bot.yaml 
+ENGINE_NAME_1: Inference_1
+ENGINE_TOKEN_1: password1
+ENGINE_NAME_2: Inference_2
+ENGINE_TOKEN_2: password2
+ENGINE_NAME_3: Inference_3
+ENGINE_TOKEN_3: password3
+ENGINE_NAME_4: Inference_4
+ENGINE_TOKEN_4: password4
+ENGINE_MODEL: deepseek-r1:32b
+TOKENIZERS_PARALLELISM: "true"
+```
+
+Any or all fo these environment variables can be set in a different manner
+prior to running the inference engine if you prefer; but all must be present
+for the engine(s) to run.
 
 ### LLM Interaction History
 
@@ -171,7 +216,7 @@ Usage: mk_db [OPTIONS]
 Options:
   --reset                 Reset the vector database of document chunks
   -f, --filelist TEXT     File with list of files to process, one per line
-  -c, --collection TEXT   Name of collection to create (default 'BossBot')
+  -c, --collection TEXT   Name of collection (default 'SEIU- contracts')
   -l, --list-collections  List the existing collections and their sizes
   --delete-collection     Delete a collection (requires confirmation)
   --cosine                Use cosine similarity metric not squared L2 norm
@@ -179,7 +224,7 @@ Options:
   -n, --num-docs INTEGER  Limit processing to N files
   -p, --pattern TEXT      Generate 'documents.cfg' from glob pattern
   -v, --verbose           More verbose output
-  -h, -?, --help          Show this message and exit.
+  -?, -h, --help          Show this message and exit.
 ```
 
 Documents that can be vectorized must be plain text. However, using tools
@@ -234,7 +279,7 @@ a configuration file—you reference the configuration, e.g.:
 ```sh
 % engine/mk_db -f documents.cfg-l2-2025-04-11 2>/dev/null
 Processed 1 documents in 6 seconds
-Collection BossBot has 3,369,537 vectors/chunks
+Collection SEIU-contracts has 3,369,537 vectors/chunks
 ```
 
 In the example shown, we discard STDERR. This hides the progress bars, but
