@@ -44,3 +44,8 @@ repos:
           - types-PyYAML
           - types-requests
         minimum_pre_commit_version: "2.9.2"
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks        

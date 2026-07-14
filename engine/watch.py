@@ -17,10 +17,11 @@ def give_answer(
     seq: int,
     query: str,
     model: str = "default",
+    collections: list[str] = ["SEIU-contracts", "UCB-Labor-Center"],
 ) -> None:
     nonce = make_nonce(16)
     hash = sha256(f"{engine} {nonce} {token}".encode()).hexdigest()
-    think, answer, seq, _seconds = ask(query, topic, user, model)
+    think, answer, seq, _seconds = ask(query, topic, user, model, collections)
     response = requests.post(
         "https://api.bossbot.org/api/give-new-answer",
         params={"User": engine, "Nonce": nonce, "Hash": hash},

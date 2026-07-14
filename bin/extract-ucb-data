@@ -1,0 +1,78 @@
+#!/bin/bash
+# This script presumes that a command similar to:
+#
+#   wget --continue -np -r -l 2 \
+#   https://laborcenter.berkeley.edu/negotiating-tech/
+#
+# Was run to create an archive of the website.  This should include numerous
+# `index.html` files; many will contain external links to PDF files of
+# contracts.
+#
+if [ "$1" == "" ]; then
+    echo "Specify directory for laborcenter.berkeley.edu 'negotiating-tech' data" >&2
+    exit 1
+fi
+
+DATA_PATH=$1
+NT="$DATA_PATH/negotiating-tech"
+if [ ! -d "$NT" ]; then
+  echo "Directory $NT does not exist." >&2
+  exit 1
+fi
+
+mkdir -p "$DATA_PATH/info-pages"
+mkdir -p "$DATA_PATH/pdfs"
+
+pdf_links() {
+    fspath="$1"
+    org="$2"
+    topics="$3"
+
+    for link in $(cat "$fspath" | grep -oP 'href="\K[^"]+\.pdf'); do
+        pdfname="$DATA_PATH/pdfs/$(basename $link)"
+        doc="$DATA_PATH/info-pages/$(basename $link).txt"
+        meta="$DATA_PATH/info-pages/$(basename $link).meta"
+        echo "Extracting to $(basename $doc)"
+        wget -q -c "$link" -O "$pdfname"
+        author="$(pdfinfo "$pdfname" | grep -oP '^Author: *\K.*')"
+        created="$(pdfinfo "$pdfname" | grep -oP '^CreationDate: *\K.*')"
+        keywords="$(pdfinfo "$pdfname" | grep -oP '^Keywords: *\K.*')"
+        subject="$(pdfinfo "$pdfname" | grep -oP '^Subject: *\K.*')"
+        title="$(pdfinfo "$pdfname" | grep -oP '^Title: *\K.*')"
+        pdftotext $pdfname $doc
+        echo "{
+            \"Author\": \"$author\",
+            \"Created\": \"$created\",
+            \"Keywords\": \"$keywords\",
+            \"Org\": \"$org\",
+            \"Subject\": \"$subject\",
+            \"Title\": \"$title\",
+            \"Topics\": \"$topics\",
+            \"URL\": \"$link\"
+            }" | jq > $meta
+    done
+}
+
+for fpath in $(find $NT -type f); do
+    fname=$(basename "$fpath")
+    if [ "$fname" != "index.html" ]; then
+        echo "Unexpected file: $fpath" >&2
+        continue
+    fi
+    relpath=$(echo $fpath | sed "s|$NT/||")
+    name=$(echo $relpath | sed 's~/~.~g' | sed 's~\.index\.html$~~')
+    doc="$DATA_PATH/info-pages/$name.txt"
+    meta="$DATA_PATH/info-pages/$name.meta"
+    topics=$(echo $name | sed 's~\.~, ~g' | sed 's/-/ /g')
+    org="UC Berkeley Labor Center"
+    url="https://laborcenter.berkeley.edu/${relpath}"
+    echo "Extracting to: $name"
+    lynx -list_inline -list_decoded -dump $fpath > $doc
+    echo "{
+    \"Org\": \"${org}\",
+    \"URL\": \"${url}\",
+    \"Topics\": \"${topics}\"
+    }" | jq > $meta
+
+    pdf_links "$fpath" "$org" "$topics"
+done
