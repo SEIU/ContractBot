@@ -306,7 +306,6 @@ def get_rag(
                 collection_name=collection,
             )
         )
-    if     
     # Only "paragraphs" that match, not the header metadata
     docs = [result.doc for result in results]
     chunks = "\n\n".join(d.split("\n.....\n")[1] for d in docs)
