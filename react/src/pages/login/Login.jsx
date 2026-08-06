@@ -55,6 +55,10 @@ export default function Login() {
           flexDirection: "column",
         }}
       >
+        <Alert severity="error" sx={{ marginBottom: "20px" }}>
+          ContractBot is undergoing maintainence and is generally broken. Please
+          come back later.
+        </Alert>
         <Typography variant="h5" sx={{ marginBottom: "25px" }}>
           Meet ContractBot, an AI chatbot to aid SEIU negotiators
         </Typography>
@@ -79,7 +83,7 @@ export default function Login() {
               error={!!errors.password}
             />
             <Button type="submit" variant="contained">
-              Login
+              Login anyway?
             </Button>
           </form>
         </Box>
